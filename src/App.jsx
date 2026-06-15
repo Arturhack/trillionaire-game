@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 // Data extracted from the provided screenshot and general knowledge
 const BILLIONAIRES = [
-  { id: 'musk', name: 'Elon Musk', company: 'Tesla, SpaceX', netWorth: 1300000000000, img: 'https://placehold.co/100x100/1e293b/ffffff?text=EM' },
-  { id: 'page', name: 'Larry Page', company: 'Google', netWorth: 301400000000, img: 'https://placehold.co/100x100/1e293b/ffffff?text=LP' },
-  { id: 'brin', name: 'Sergey Brin', company: 'Google', netWorth: 277900000000, img: 'https://placehold.co/100x100/1e293b/ffffff?text=SB' },
-  { id: 'bezos', name: 'Jeff Bezos', company: 'Amazon', netWorth: 255500000000, img: 'https://placehold.co/100x100/1e293b/ffffff?text=JB' },
-  { id: 'ellison', name: 'Larry Ellison', company: 'Oracle', netWorth: 241400000000, img: 'https://placehold.co/100x100/1e293b/ffffff?text=LE' }
+  { id: 'musk', name: 'Elon Musk', company: 'Tesla, SpaceX', netWorth: 1300000000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Elon_Musk_Royal_Society_crop.jpg/800px-Elon_Musk_Royal_Society_crop.jpg' },
+  { id: 'page', name: 'Larry Page', company: 'Google', netWorth: 301400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Larry_Page_in_the_European_Parliament%2C_17.06.2009_%28cropped%29.jpg/800px-Larry_Page_in_the_European_Parliament%2C_17.06.2009_%28cropped%29.jpg' },
+  { id: 'brin', name: 'Sergey Brin', company: 'Google', netWorth: 277900000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Sergey_Brin_cropped.jpg/800px-Sergey_Brin_cropped.jpg' },
+  { id: 'bezos', name: 'Jeff Bezos', company: 'Amazon', netWorth: 255500000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_%2839074799225%29_%28cropped%29.jpg/800px-Jeff_Bezos_at_Amazon_Spheres_Grand_Opening_in_Seattle_-_2018_%2839074799225%29_%28cropped%29.jpg' },
+  { id: 'ellison', name: 'Larry Ellison', company: 'Oracle', netWorth: 241400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Larry_Ellison_in_2010.jpg/800px-Larry_Ellison_in_2010.jpg' }
 ];
 
 const ITEMS = [
@@ -55,9 +55,19 @@ const formatShortAbbreviation = (num) => {
 export default function App() {
   const [selectedBillionaireId, setSelectedBillionaireId] = useState(BILLIONAIRES[0].id);
   const [inventory, setInventory] = useState({});
-  const [activeTab, setActiveTab] = useState('luxury'); // 'luxury', 'world', 'compare'
+  const [activeTab, setActiveTab] = useState('luxury'); // 'luxury', 'world', 'compare', 'stats'
+  const [userSalary, setUserSalary] = useState(50000);
+  const [secondsOnPage, setSecondsOnPage] = useState(0);
 
   const currentPerson = BILLIONAIRES.find(b => b.id === selectedBillionaireId);
+
+  // Real-time counter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsOnPage(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [selectedBillionaireId]);
 
   // Calculate total spent
   const totalSpent = Object.keys(inventory).reduce((total, itemId) => {
@@ -71,6 +81,7 @@ export default function App() {
   // Reset inventory when changing billionaires
   useEffect(() => {
     setInventory({});
+    setSecondsOnPage(0);
   }, [selectedBillionaireId]);
 
   const handleBuy = (item, amount = 1) => {
@@ -104,9 +115,11 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xl border border-slate-700 shadow-inner">
-                {currentPerson.name.charAt(0)}
-              </div>
+              <img 
+                src={currentPerson.img} 
+                alt={currentPerson.name} 
+                className="w-14 h-14 rounded-full bg-slate-800 object-cover border-2 border-slate-700 shadow-inner"
+              />
               <div>
                 <p className="text-sm text-slate-400 font-medium tracking-wider uppercase">Remaining Net Worth</p>
                 <p className="text-3xl md:text-4xl font-bold text-emerald-400 font-mono tracking-tighter">
@@ -163,11 +176,12 @@ export default function App() {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-slate-900/50 p-1 rounded-xl border border-slate-800 mb-8 max-w-fit mx-auto md:mx-0">
+        <div className="flex space-x-1 bg-slate-900/50 p-1 rounded-xl border border-slate-800 mb-8 max-w-fit mx-auto md:mx-0 overflow-x-auto">
           {[
             { id: 'luxury', label: 'Luxury Items' },
             { id: 'world', label: 'World Problems' },
-            { id: 'compare', label: 'GDP Compare' }
+            { id: 'compare', label: 'GDP Compare' },
+            { id: 'stats', label: 'Income & Stats' }
           ].map(tab => (
             <button
               key={tab.id}
@@ -184,7 +198,7 @@ export default function App() {
         </div>
 
         {/* Shopping Grid (Luxuries & World Problems) */}
-        {activeTab !== 'compare' && (
+        {(activeTab === 'luxury' || activeTab === 'world') && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {ITEMS.filter(item => item.category === activeTab).map(item => {
               const count = inventory[item.id] || 0;
@@ -284,10 +298,109 @@ export default function App() {
           </div>
         )}
 
+        {/* Income & Stats View */}
+        {activeTab === 'stats' && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Real-time earnings */}
+            <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-emerald-500"></div>
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                ⏱️ Real-Time Earnings Tracker
+              </h3>
+              <p className="text-slate-400 text-sm mb-6">Assuming a conservative 5% annual return on their current net worth, here is how much passive income {currentPerson.name} makes over time.</p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <div className="text-xs text-slate-500 uppercase mb-1">Per Year</div>
+                  <div className="text-lg font-mono text-emerald-400 font-bold">{formatShortAbbreviation(currentPerson.netWorth * 0.05)}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <div className="text-xs text-slate-500 uppercase mb-1">Per Day</div>
+                  <div className="text-lg font-mono text-emerald-400 font-bold">{formatShortAbbreviation((currentPerson.netWorth * 0.05) / 365)}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <div className="text-xs text-slate-500 uppercase mb-1">Per Hour</div>
+                  <div className="text-lg font-mono text-emerald-400 font-bold">{formatExactDollar((currentPerson.netWorth * 0.05) / 8760)}</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <div className="text-xs text-slate-500 uppercase mb-1">Per Second</div>
+                  <div className="text-lg font-mono text-emerald-400 font-bold">{formatExactDollar((currentPerson.netWorth * 0.05) / 31536000)}</div>
+                </div>
+              </div>
+
+              <div className="text-center p-6 bg-slate-950 rounded-xl border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                <div className="text-sm text-slate-400 mb-2">Money made since you opened this profile</div>
+                <div className="text-5xl md:text-6xl font-black text-white font-mono tracking-tighter">
+                  {formatExactDollar(((currentPerson.netWorth * 0.05) / 31536000) * secondsOnPage)}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* You vs Them */}
+              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 flex flex-col">
+                <h3 className="text-xl font-bold mb-4">You vs. The Billionaire</h3>
+                <p className="text-slate-400 text-sm mb-6">Enter your annual salary to see how many years it would take you to earn their net worth (without spending a single cent).</p>
+                
+                <div className="mb-6">
+                  <label className="block text-xs text-slate-500 uppercase mb-2">Your Annual Salary (USD)</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                    <input 
+                      type="number" 
+                      value={userSalary || ''}
+                      onChange={(e) => setUserSalary(Number(e.target.value))}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl py-3 pl-8 pr-4 text-white font-mono focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="e.g. 50000"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-5 mt-auto">
+                  <div className="text-3xl font-black text-rose-400 font-mono mb-1">
+                    {new Intl.NumberFormat('en-US').format(Math.round(currentPerson.netWorth / (userSalary || 1)))} <span className="text-lg text-rose-500/70">Years</span>
+                  </div>
+                  <p className="text-xs text-rose-300 leading-relaxed">
+                    If you lived to be 80 years old, that would take <span className="font-bold">{new Intl.NumberFormat('en-US').format(Math.round((currentPerson.netWorth / (userSalary || 1)) / 80))} lifetimes</span> of working every single day.
+                  </p>
+                </div>
+              </div>
+
+              {/* Tax Perspective */}
+              <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 flex flex-col">
+                <h3 className="text-xl font-bold mb-4">The Tax Perspective</h3>
+                <p className="text-slate-400 text-sm mb-6">Most billionaires don't pay standard income tax because their wealth is tied up in stock. Here is a theoretical look.</p>
+
+                <div className="space-y-4 mt-auto">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-slate-300">If taxed at standard US Income Rate (37%)</span>
+                    </div>
+                    <div className="text-xl font-mono text-emerald-500 font-bold">
+                      {formatShortAbbreviation(currentPerson.netWorth * 0.37)}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">Enough to fund NASA for ~15 years.</div>
+                  </div>
+
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-slate-300">Estimated actual effective tax rate (~8.2%)</span>
+                    </div>
+                    <div className="text-xl font-mono text-blue-400 font-bold">
+                      {formatShortAbbreviation(currentPerson.netWorth * 0.082)}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">Due to borrowing against assets and capital gains loopholes.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
       
       {/* Footer receipt summary */}
-      {totalSpent > 0 && activeTab !== 'compare' && (
+      {totalSpent > 0 && (activeTab === 'luxury' || activeTab === 'world') && (
         <div className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.3)] z-40">
            <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
              <div className="text-sm text-slate-400 hidden md:block">
