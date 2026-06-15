@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 // Data extracted from the provided screenshot and general knowledge
 const BILLIONAIRES = [
-  { id: 'musk', name: 'Elon Musk', company: 'Tesla, SpaceX', netWorth: 1300000000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg/220px-Elon_Musk_Royal_Society_%28crop1%29.jpg' },
-  { id: 'page', name: 'Larry Page', company: 'Google', netWorth: 301400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Larry_Page_in_the_European_Parliament%2C_17.06.2009_%28cropped%29.jpg/220px-Larry_Page_in_the_European_Parliament%2C_17.06.2009_%28cropped%29.jpg' },
-  { id: 'brin', name: 'Sergey Brin', company: 'Google', netWorth: 277900000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Sergey_Brin_cropped.jpg/220px-Sergey_Brin_cropped.jpg' },
-  { id: 'bezos', name: 'Jeff Bezos', company: 'Amazon', netWorth: 255500000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Jeff_Bezos_visits_LAAFB_SMC_%283908618%29_%28cropped%29.jpeg/220px-Jeff_Bezos_visits_LAAFB_SMC_%283908618%29_%28cropped%29.jpeg' },
-  { id: 'ellison', name: 'Larry Ellison', company: 'Oracle', netWorth: 241400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Larry_Ellison_picture.png/220px-Larry_Ellison_picture.png' }
+  { id: 'musk', name: 'Elon Musk', company: 'Tesla, SpaceX', netWorth: 1300000000000, img: 'https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg' },
+  { id: 'page', name: 'Larry Page', company: 'Google', netWorth: 301400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Larry_Page_in_the_European_Parliament%2C_17.06.2009_%28cropped%29.jpg' },
+  { id: 'brin', name: 'Sergey Brin', company: 'Google', netWorth: 277900000000, img: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Sergey_Brin_cropped.jpg' },
+  { id: 'bezos', name: 'Jeff Bezos', company: 'Amazon', netWorth: 255500000000, img: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Jeff_Bezos_visits_LAAFB_SMC_%283908618%29_%28cropped%29.jpeg' },
+  { id: 'ellison', name: 'Larry Ellison', company: 'Oracle', netWorth: 241400000000, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Larry_Ellison_picture.png/1920px-Larry_Ellison_picture.png' }
 ];
 
 const ITEMS = [
@@ -118,6 +118,7 @@ export default function App() {
               <img 
                 src={currentPerson.img} 
                 alt={currentPerson.name} 
+                referrerPolicy="no-referrer"
                 onError={(e) => {
                   e.target.onerror = null; 
                   e.target.src = `https://ui-avatars.com/api/?name=${currentPerson.name.replace(' ', '+')}&background=0D8ABC&color=fff&size=128`;
